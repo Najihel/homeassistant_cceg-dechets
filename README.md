@@ -10,6 +10,15 @@ Source des données : [Carte ArcGIS CCEG – Mes jours de collecte](https://expe
 
 ---
 
+## ⚠️ Avertissement
+
+**Cette intégration est fournie telle quelle, sans garantie d'aucune sorte.**
+Le créateur de cette intégration ne peut être tenu responsable des problèmes potentiels liés à son utilisation, notamment : perte de données, dysfonctionnements de Home Assistant, incompatibilités avec les mises à jour du portail Espace Citoyens ou de Home Assistant, ou tout autre dommage direct ou indirect.
+
+**Utilisez cette intégration à vos propres risques.**
+
+---
+
 ## Fonctionnalités
 
 - Détection automatique de votre zone via les coordonnées GPS de `zone.home`
