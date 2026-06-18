@@ -1,0 +1,49 @@
+{
+  "title": "CCEG – Collecte des déchets",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Mode de sélection de votre zone",
+        "description": "Choisissez comment identifier votre zone de collecte.",
+        "data": {
+          "selection_mode": "Mode de sélection"
+        }
+      },
+      "gps": {
+        "title": "Confirmation de votre zone détectée",
+        "description": "Zone détectée à partir de votre position (`zone.home`) :\n\n**{zone_nom}**\n\n- Jour de collecte : **{jourcol}**\n- Semaine paire : {sempaire}\n- Semaine impaire : {semimpaire}\n\nCliquez sur **Soumettre** pour confirmer et nommer cette entrée.",
+        "data": {}
+      },
+      "commune": {
+        "title": "Votre commune",
+        "description": "Sélectionnez votre commune dans la liste des communes de la CCEG Erdre & Gesvres.",
+        "data": {
+          "commune": "Commune"
+        }
+      },
+      "zone": {
+        "title": "Votre quartier / zone de collecte",
+        "description": "Plusieurs zones de collecte existent dans votre commune. Sélectionnez celle qui correspond à votre adresse.",
+        "data": {
+          "zone_fid": "Zone de collecte"
+        }
+      },
+      "name": {
+        "title": "Nommer cette intégration",
+        "description": "Donnez un nom à cette entrée — il sera utilisé comme titre du calendrier et du device.\n\nZone sélectionnée : **{zone_nom}** ({jourcol})\n\nVous pouvez conserver le nom proposé ou le personnaliser (ex. *Maison*, *Résidence principale*).",
+        "data": {
+          "entry_name": "Nom de l'intégration"
+        }
+      }
+    },
+    "error": {
+      "api_error": "Impossible de contacter le service ArcGIS CCEG. Vérifiez votre connexion Internet.",
+      "no_home_zone": "La zone `zone.home` est introuvable ou ne contient pas de coordonnées GPS. Vérifiez la configuration de votre domicile dans Home Assistant.",
+      "gps_zone_not_found": "Aucune zone CCEG trouvée à votre position. Êtes-vous bien dans la Communauté de Communes Erdre & Gesvres ?",
+      "zone_not_found": "Aucune zone de collecte trouvée pour cette commune."
+    },
+    "abort": {
+      "already_configured": "Cette zone de collecte est déjà configurée."
+    }
+  }
+}

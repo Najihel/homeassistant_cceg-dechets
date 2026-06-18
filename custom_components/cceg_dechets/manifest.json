@@ -1,0 +1,13 @@
+{
+  "domain": "cceg_dechets",
+  "name": "CCEG – Collecte des déchets",
+  "version": "1.0.0",
+  "integration_type": "service",
+  "documentation": "https://github.com/Najihel/homeassistant_cceg-dechets",
+  "issue_tracker": "https://github.com/Najihel/homeassistant_cceg-dechets/issues",
+  "requirements": [],
+  "dependencies": [],
+  "codeowners": ["@Najihel"],
+  "iot_class": "cloud_polling",
+  "config_flow": true
+}
