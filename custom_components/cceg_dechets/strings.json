@@ -30,7 +30,7 @@
       },
       "name": {
         "title": "Nommer cette intégration",
-        "description": "Donnez un nom à cette entrée — il sera utilisé comme titre du calendrier et du device.\n\nZone sélectionnée : **{zone_nom}** ({jourcol})\n\nVous pouvez conserver le nom proposé ou le personnaliser (ex. *Maison*, *Résidence principale*).",
+        "description": "Donnez un nom à cette entrée — il sera utilisé comme titre du calendrier et du device.\n\nZone sélectionnée : **{zone_nom}** — {jourcol}\nRotation : {rotation}\n\nVous pouvez conserver le nom proposé ou le personnaliser (ex. *Maison*, *Résidence principale*).",
         "data": {
           "entry_name": "Nom de l'intégration"
         }

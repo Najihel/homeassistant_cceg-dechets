@@ -137,15 +137,23 @@ class CcegDechetsConfigFlow(ConfigFlow, domain=DOMAIN):
                 step_id="gps", data_schema=vol.Schema({}), errors=errors
             )
 
+        # Construire des descriptions lisibles même si sempaire/semimpaire sont vides
+        if zone.om_semaine and zone.jj_semaine:
+            sempaire_display = f"Déchets ménagers (OM semaines {zone.om_semaine}s)"
+            semimpaire_display = f"Déchets recyclables (semaines {zone.jj_semaine}s)"
+        else:
+            sempaire_display = zone.sempaire or "Non renseigné"
+            semimpaire_display = zone.semimpaire or "Non renseigné"
+
         return self.async_show_form(
             step_id="gps",
             data_schema=vol.Schema({}),
             errors=errors,
             description_placeholders={
-                "zone_nom": zone.nom,
-                "jourcol": zone.jourcol,
-                "sempaire": zone.sempaire,
-                "semimpaire": zone.semimpaire,
+                "zone_nom": zone.nom or f"Zone #{zone.fid}",
+                "jourcol": zone.jourcol or "Inconnu",
+                "sempaire": sempaire_display,
+                "semimpaire": semimpaire_display,
             },
         )
 
@@ -273,12 +281,31 @@ class CcegDechetsConfigFlow(ConfigFlow, domain=DOMAIN):
                 )
             }
         )
+        # Construire un résumé lisible de la zone pour l'étape de nommage
+        if zone:
+            zone_nom_display = zone.nom or f"Zone #{zone.fid}"
+            jourcol_display = zone.jourcol or "Inconnu"
+            if zone.om_semaine and zone.jj_semaine:
+                rotation_display = (
+                    f"OM semaines {zone.om_semaine}s / "
+                    f"Recyclables semaines {zone.jj_semaine}s"
+                )
+            elif zone.sempaire or zone.semimpaire:
+                rotation_display = " | ".join(filter(None, [zone.sempaire, zone.semimpaire]))
+            else:
+                rotation_display = "Rotation non déterminée"
+        else:
+            zone_nom_display = ""
+            jourcol_display = ""
+            rotation_display = ""
+
         return self.async_show_form(
             step_id="name",
             data_schema=schema,
             description_placeholders={
-                "zone_nom": zone.nom if zone else "",
-                "jourcol": zone.jourcol if zone else "",
+                "zone_nom": zone_nom_display,
+                "jourcol": jourcol_display,
+                "rotation": rotation_display,
             },
         )
 
@@ -287,11 +314,29 @@ class CcegDechetsConfigFlow(ConfigFlow, domain=DOMAIN):
     # ──────────────────────────────────────────────────────────────────────────
     @staticmethod
     def _zone_label(zone: CollecteZone) -> str:
+        """
+        Construit un label discriminant pour le sélecteur de zones.
+
+        Quand plusieurs zones d'une même commune ont le même nom et le même
+        jourcol (cas réel observé sur SAINT-MARS-DU-DESERT), on différencie
+        via la rotation OM/recyclables et en dernier recours via le FID.
+        """
         label = zone.nom or f"Zone {zone.fid}"
+
         if zone.jourcol:
             label += f"  —  {zone.jourcol}"
-        if zone.sempaire:
-            label += f"  (sem. paire : {zone.sempaire[:40]})"
+
+        # Afficher la rotation si disponible (info la plus utile pour l'utilisateur)
+        if zone.om_semaine and zone.jj_semaine:
+            label += f"  (OM sem. {zone.om_semaine}s / Recyclables sem. {zone.jj_semaine}s)"
+        elif zone.sempaire:
+            label += f"  (sem. paire : {zone.sempaire[:50]})"
+        elif zone.semimpaire:
+            label += f"  (sem. impaire : {zone.semimpaire[:50]})"
+        else:
+            # Dernier recours : FID pour distinguer des zones sans description
+            label += f"  [zone #{zone.fid}]"
+
         return label
 
     def _create_entry(self, zone: CollecteZone, entry_name: str) -> ConfigFlowResult:

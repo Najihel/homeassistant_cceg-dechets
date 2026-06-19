@@ -103,17 +103,31 @@ def _parse_semaine(sempaire: str, semimpaire: str) -> tuple[str | None, str | No
     return None, None
 
 
+def _str_field(value) -> str:
+    """
+    Convertit un champ ArcGIS en chaîne utilisable.
+
+    ArcGIS peut renvoyer None, 0 (entier), ou une chaîne vide pour les champs
+    textuels non renseignés. On normalise tout ça en chaîne vide.
+    """
+    if value is None:
+        return ""
+    if not isinstance(value, str):
+        return ""  # ignore les 0, entiers, etc.
+    return value.strip()
+
+
 def _attrs_to_zone(attrs: dict) -> CollecteZone:
     """Convertit un dict d'attributs ArcGIS en CollecteZone."""
-    jourcol = (attrs.get("jourcol") or "").strip()
-    sempaire = (attrs.get("sempaire") or "").strip()
-    semimpaire = (attrs.get("semimpaire") or "").strip()
+    jourcol = _str_field(attrs.get("jourcol"))
+    sempaire = _str_field(attrs.get("sempaire"))
+    semimpaire = _str_field(attrs.get("semimpaire"))
 
     # Fallback sur paire/impaire si sempaire/semimpaire absents
     if not sempaire:
-        sempaire = (attrs.get("paire") or "").strip()
+        sempaire = _str_field(attrs.get("paire"))
     if not semimpaire:
-        semimpaire = (attrs.get("impaire") or "").strip()
+        semimpaire = _str_field(attrs.get("impaire"))
 
     om_semaine, jj_semaine = _parse_semaine(sempaire, semimpaire)
 
