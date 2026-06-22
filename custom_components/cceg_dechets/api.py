@@ -107,18 +107,37 @@ def _str_field(value) -> str:
     """
     Convertit un champ ArcGIS en chaîne utilisable.
 
-    ArcGIS peut renvoyer None, 0 (entier), ou une chaîne vide pour les champs
-    textuels non renseignés. On normalise tout ça en chaîne vide.
+    ArcGIS peut renvoyer None, 0 (entier), "0" (chaîne sentinelle), ou une
+    chaîne vide pour les champs textuels non renseignés.
+    Cas observé sur SAINT-MARS-DU-DESERT : sempaire="0", semimpaire="0"
+    alors que paire/impaire contiennent les vraies valeurs textuelles.
     """
     if value is None:
         return ""
     if not isinstance(value, str):
-        return ""  # ignore les 0, entiers, etc.
-    return value.strip()
+        return ""  # ignore les entiers (0, etc.)
+    stripped = value.strip()
+    if stripped == "0":
+        return ""  # "0" est la valeur sentinelle ArcGIS pour "non renseigné"
+    return stripped
 
 
 def _attrs_to_zone(attrs: dict) -> CollecteZone:
     """Convertit un dict d'attributs ArcGIS en CollecteZone."""
+    # Log des valeurs brutes pour diagnostiquer les cas imprévus
+    _LOGGER.debug(
+        "ArcGIS raw attrs — FID=%s nom=%r jourcol=%r "
+        "sempaire=%r (type=%s) semimpaire=%r (type=%s) "
+        "paire=%r (type=%s) impaire=%r (type=%s)",
+        attrs.get("FID"),
+        attrs.get("nom"),
+        attrs.get("jourcol"),
+        attrs.get("sempaire"), type(attrs.get("sempaire")).__name__,
+        attrs.get("semimpaire"), type(attrs.get("semimpaire")).__name__,
+        attrs.get("paire"), type(attrs.get("paire")).__name__,
+        attrs.get("impaire"), type(attrs.get("impaire")).__name__,
+    )
+
     jourcol = _str_field(attrs.get("jourcol"))
     sempaire = _str_field(attrs.get("sempaire"))
     semimpaire = _str_field(attrs.get("semimpaire"))
@@ -130,6 +149,11 @@ def _attrs_to_zone(attrs: dict) -> CollecteZone:
         semimpaire = _str_field(attrs.get("impaire"))
 
     om_semaine, jj_semaine = _parse_semaine(sempaire, semimpaire)
+
+    _LOGGER.debug(
+        "ArcGIS parsed — sempaire=%r semimpaire=%r → om_semaine=%r jj_semaine=%r",
+        sempaire, semimpaire, om_semaine, jj_semaine,
+    )
 
     return CollecteZone(
         fid=attrs.get("FID", 0),
